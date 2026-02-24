@@ -16,7 +16,7 @@ The helper script, `dau_pipeline.py`, to load data from S3 into the ES instance 
 
 Clone the OpenLXP git repo onto your local machine:
 ```console
-git clone https://github.com/OpenLXP/openlxp-xse.git
+git clone https://github.com/adlnet/ecc-openlxp-xse.git
 ```
 
 Navigate into the 'openlxp-xse' directory, ensure `docker-compose.yml` file is in the directory and run the following commands:
@@ -65,3 +65,9 @@ Congratulations, you've installed and configured an ES cluster, indexed sample d
 
 For more details on Elasticsearch, please refer to the following documentation:
 * [Elasticsearch - What is Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/7.11/elasticsearch-intro.html)
+
+## Additional Documentation
+[ECC-Openlxp Wiki can be found here](https://github.com/adlnet/ecc-openlxp-xds-ui/wiki)
+
+## License
+This project uses the [Apache](http://www.apache.org/licenses/LICENSE-2.0) license.
