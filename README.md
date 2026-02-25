@@ -1,66 +1,84 @@
 # OpenLXP - Experience Search Engine (XSE)
 
-This directory contains the code to install, configure, and run a search engine to support the OpenLXP platform.
+XSE works to streamline the search capabilities relied upon by Experience Discovery Service ([XDS](https://github.com/adlnet/ecc-openlxp-xds)).  The Experience Indexing Service ([XIS](https://github.com/adlnet/ecc-openlxp-xis)) loads records into XSE (assumed to be Elasticsearch).
+
+This repository contains an example docker-compose in order to deploy a Elasticsearch cluster for the OpenLXP platform.  For local testing it is recommended that the user simply uncomment the `eso1` instance defined in the XIS docker-compose ([eso1](https://github.com/adlnet/ecc-openlxp-xis/blob/7658d87a6b863eaf21bf1580a20ec682e8616ee3/docker-compose.yml#L57))
+
+
+## ECC System Architecture
+
+```mermaid
+---
+title: ECC Connected Systems
+---
+graph TD;
+        subgraph Legend
+                1("System")-->|MVP|2("System");
+                1("System")-.->|Future Planned|2("System");
+        end
+        subgraph External Applications
+                XSR;
+                XSS[XSS/LDSS];
+        end
+        subgraph ECC
+                XIS;
+                XDS;
+                XDSUI[XDS UI];
+                XMS;
+                XMSUI[XMS UI];
+                XIA;
+                XSE;
+        end
+        XSS-->|Schema|XIS & XIA;
+        XIA-->|Courses|XIS;
+        XIS-->|Courses|XMS & XDS & XSE;
+        XSE-->|Courses|XDS;
+        XSR-->|Courses|XIA;
+        XDS-->|Courses|XDSUI;
+        XMS-->|Courses|XMSUI;
+```
+
 
 ## Intended use
 
-Intended use of this code is that a user could reference this code and architecture as boilerplate code to stand-up a search engine for their learning experience platform on OpenLXP.
+Intended use of this is that a user could reference this architecture as boilerplate to stand-up a search engine for their learning experience platform on OpenLXP.
 
-## Capabilities and limitations
+## Prerequisites
+### Install Docker & docker-compose
+#### Windows & MacOS
+- Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop) (docker compose included)
 
-The code in this repository leverages AWS infrastructure for hosting. Ideally, the code can be modified to run on any major cloud platform with parameter tweaks, but has not been verified. Additionally, the code within this repository is specifically for [Elasticsearch 7.11](https://www.elastic.co/guide/en/elasticsearch/reference/7.11/getting-started.html) as the search engine. We are utilizing Elasticsearch (ES) for representative purposes, users can leverage an additional search engine as it fits their budget and architecture.
 
-The helper script, `dau_pipeline.py`, to load data from S3 into the ES instance has been tested with Python 3.6. Please ensure you have Python >=3.6 installed before executing the script.
+#### Linux
+You can download Docker Compose binaries from the
+[release page](https://github.com/docker/compose/releases) on this repository.
 
-## Directions for use
+Rename the relevant binary for your OS to `docker-compose` and copy it to `$HOME/.docker/cli-plugins`
 
-Clone the OpenLXP git repo onto your local machine:
-```console
+Or copy it into one of these folders to install it system-wide:
+
+* `/usr/local/lib/docker/cli-plugins` OR `/usr/local/libexec/docker/cli-plugins`
+* `/usr/lib/docker/cli-plugins` OR `/usr/libexec/docker/cli-plugins`
+
+(might require making the downloaded file executable with `chmod +x`)
+
+## Clone the project
+Clone the Github repository
+```
 git clone https://github.com/adlnet/ecc-openlxp-xse.git
-```
+```  
 
-Navigate into the 'openlxp-xse' directory, ensure `docker-compose.yml` file is in the directory and run the following commands:
-```console
-sudo sysctl -w vm.max_map_count=262144
-sudo docker-compose up -d
-```
-Congratulations - you've stood-up a 3-node Elasticsearch cluster with Kibana!
+## Deployment
+1. Create the elastic docker network
+    Open a terminal and run the following command in the root directory of the project.
+    ```
+    docker network create elastic
+    ```
 
-To verify the cluster is running, run the below curl command from your Linux terminal or Windows CMD prompt.
-**Note:** you may need to update the 'Security Group' of your Elasticsearch EC2 instance to accept traffic on port 9200 from your IP address. Search 'whats my IP' in Google or your favorite search engine to find out your local IP address.
-```console
-curl -X GET "[public-ip-address-of-EC2-ES]:9200/_cat/health?v=true&pretty"
-# If executing within a VM within the VPC run: curl -X GET "[private-ip-address-of-EC2-ES]:9200/_cat/health?v=true&pretty"
-```
-
-Next, we will index a set of sample documents from an S3 bucket into the ES instance. To assist with this process, we'll use a sample pipeline that takes processed DAU data from XIS/XIA and configures into the format ES is expecting.
-
-Within your terminal (Linux or CMD), navigate to the `src` folder. Once in the `src` folder, run the below command to install necessary python packages to execute the script:
-```console
-python3 pip3 install -r requirements.txt
-```
-
-Next, run the following command edit the document using 'nano' or a similar text editor:
-```console
-nano dau_pipeline.py
-```
-
-Within the `dau_pipeline.py` file, update the IP address for your ES instance and save the document. Be sure to use the *Public/Private IP address* for the ES instance, which you can confirm on the AWS Console. The IP address you select depends on whether the VM you're executing the pipeline is within the VPC (private IP) or outside (public IP) of the ES cluster.
-Back on the terminal, update `my-index-name` `my-s3-bucket-name` `sample-DAU-data.json` to match the names of the index, S3 bucket, and JSON file of the sample DAU data. After doing so, run the following command:
-```console
-python3 dau_pipeline.py 'my-index-name' 'my-s3-bucket-name' 'sample-DAU-data.json'
-```
-
-Success! You've now indexed sample course data into ES and it's ready to be queried. To verify the data has been loaded into ES correctly, try running the following script from your terminal:
-```console
-curl -X GET "[public-ip-address-of-EC2-ES]:9200/[my-index-name]/_search?pretty" -H 'Content-Type: application/json' -d'
-{
-  "query": { "match": { "Course.CourseDescription": "and service" } }
-}
-'
-```
-
-Congratulations, you've installed and configured an ES cluster, indexed sample documents, and conducted a sample query on your ES instance. Happy searching!
+2. Run the command below to deploy XSE from `docker-compose.yaml` 
+    ```
+    docker-compose up -d --build
+    ```
 ## Further resources
 
 For more details on Elasticsearch, please refer to the following documentation:
