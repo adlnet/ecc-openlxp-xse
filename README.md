@@ -1,8 +1,8 @@
 # OpenLXP - Experience Search Engine (XSE)
 
-XSE works to streamline the search capabilities relied upon by Experience Discovery Service ([XDS](https://github.com/adlnet/ecc-openlxp-xds)).  The Experience Indexing Service ([XIS](https://github.com/adlnet/ecc-openlxp-xis)) loads records into XSE (assumed to be Elasticsearch).
+XSE works to streamline the search capabilities relied upon by Experience Discovery Service ([XDS](https://github.com/adlnet/ecc-openlxp-xds)). The Experience Indexing Service ([XIS](https://github.com/adlnet/ecc-openlxp-xis)) loads records into XSE (assumed to be Elasticsearch).
 
-This repository contains an example docker-compose in order to deploy a Elasticsearch cluster for the OpenLXP platform.  For local testing it is recommended that the user simply uncomment the `eso1` instance defined in the XIS docker-compose ([eso1](https://github.com/adlnet/ecc-openlxp-xis/blob/7658d87a6b863eaf21bf1580a20ec682e8616ee3/docker-compose.yml#L57))
+This repository contains an example docker-compose in order to deploy an Elasticsearch cluster for the OpenLXP platform. For local testing it is recommended that the user simply uncomment the `eso1` instance defined in the XIS docker-compose ([eso1](https://github.com/adlnet/ecc-openlxp-xis/blob/7658d87a6b863eaf21bf1580a20ec682e8616ee3/docker-compose.yml#L57))
 
 
 ## ECC System Architecture
